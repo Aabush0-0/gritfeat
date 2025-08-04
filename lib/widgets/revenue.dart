@@ -60,13 +60,14 @@ class RevenueWidget extends StatelessWidget {
                 RichText(
                   text: TextSpan(
                     text: '\$6,332',
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
                     children: [
                       TextSpan(
                         text: ' Spent last month',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
                     ],
