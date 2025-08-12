@@ -18,6 +18,14 @@ class _TabbarScreenState extends State<TabbarScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: TabBar(
+            labelColor: Colors.green,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(width: 3, color: Colors.red),
+              insets: EdgeInsetsGeometry.symmetric(
+                horizontal: MediaQuery.of(context).size.width / 5,
+              ),
+            ),
+
             tabs: [
               Tab(text: 'View All'),
               Tab(text: 'Mentioned'),
