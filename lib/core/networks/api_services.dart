@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:my_app/core/networks/api_urls.dart';
 
 class DioClient {
   // Private constructor
   DioClient._internal() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://jsonplaceholder.typicode.com/',
+        baseUrl: Urls.baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {'Content-Type': 'application/json'},
