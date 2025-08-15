@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:my_app/core/networks/api_urls.dart';
 
 class DioClient {
-  // Private constructor
   DioClient._internal() {
     _dio = Dio(
       BaseOptions(
@@ -13,7 +12,6 @@ class DioClient {
       ),
     );
 
-    // Add interceptors
     _dio.interceptors.addAll([
       LogInterceptor(
         request: true,
@@ -23,24 +21,22 @@ class DioClient {
       ),
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // Example: Add a fake auth token automatically
           options.headers['Authorization'] = 'Bearer myToken123';
-          print("➡️ Sending request to: ${options.uri}");
+          print("Sending request to: ${options.uri}");
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          print("✅ Response status: ${response.statusCode}");
+          print("Response status: ${response.statusCode}");
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          print("❌ Dio Error: ${e.message}");
+          print("Dio Error: ${e.message}");
           return handler.next(e);
         },
       ),
     ]);
   }
 
-  // Static singleton instance
   static final DioClient _instance = DioClient._internal();
 
   late Dio _dio;
