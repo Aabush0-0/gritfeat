@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:my_app/core/networks/api_services.dart';
+import 'package:my_app/core/networks/api_urls.dart';
 import 'package:my_app/services/form_data.dart';
 
 class CreatePostPage extends StatefulWidget {
@@ -14,6 +17,38 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   bool isLoading = false;
   String responseMessage = "";
+  String tokenStatus = "Checking token...";
+
+  @override
+  void initState() {
+    super.initState();
+    checkToken();
+  }
+
+  Future<void> checkToken() async {
+    try {
+      final response = await ApiServices.dio.get(
+        'posts', // any protected endpoint
+        options: Options(
+          headers: {'Authorization': 'Bearer ${Urls.trefleToken}'},
+        ),
+      );
+
+      setState(() {
+        tokenStatus = "Token is valid! Status: ${response.statusCode}";
+      });
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        setState(() {
+          tokenStatus = "Token is invalid or expired";
+        });
+      } else {
+        setState(() {
+          tokenStatus = "Error checking token: ${e.message}";
+        });
+      }
+    }
+  }
 
   void sendPost() async {
     if (titleController.text.trim().isEmpty ||
@@ -74,20 +109,36 @@ class _CreatePostPageState extends State<CreatePostPage> {
         centerTitle: true,
         backgroundColor: Colors.blue[200],
       ),
-      body: Container(
-        padding: EdgeInsets.all(30),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(30),
         child: Column(
           children: [
+            Text(
+              tokenStatus,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: titleController,
               decoration: InputDecoration(
                 labelText: 'Title',
-                labelStyle: TextStyle(color: Colors.red),
+                labelStyle: const TextStyle(color: Colors.red),
                 hintText: 'Enter post title',
                 filled: true,
-                fillColor: Colors.green,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 1.5),
+                fillColor: Colors.green.shade100,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(
+                    color: Colors.deepPurple,
+                    width: 2,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -97,12 +148,19 @@ class _CreatePostPageState extends State<CreatePostPage> {
               controller: bodyController,
               decoration: InputDecoration(
                 labelText: 'Body',
-                labelStyle: TextStyle(color: Colors.red),
+                labelStyle: const TextStyle(color: Colors.red),
                 hintText: 'Enter post body',
                 filled: true,
-                fillColor: Colors.green,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 1.5),
+                fillColor: Colors.green.shade100,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(
+                    color: Colors.deepPurple,
+                    width: 2,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -110,6 +168,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: isLoading ? null : sendPost,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 15,
+                ),
+                backgroundColor: Colors.blue[300],
+              ),
               child:
                   isLoading
                       ? const CircularProgressIndicator(color: Colors.white)

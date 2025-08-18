@@ -21,7 +21,7 @@ class ApiServices {
       ),
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          options.queryParameters['token'] = Urls.trefleToken;
+          options.headers['Authorization'] = 'Bearer ${Urls.trefleToken}';
 
           return handler.next(options);
         },
