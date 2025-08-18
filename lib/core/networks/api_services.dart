@@ -41,6 +41,5 @@ class ApiServices {
 
   late Dio _dio;
 
-  // Public getter
   static Dio get dio => _instance._dio;
 }
