@@ -15,9 +15,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
 
-  bool isLoading = false;
-  String responseMessage = "";
-  String tokenStatus = "Checking token...";
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
+  final ValueNotifier<String> responseMessage = ValueNotifier("");
+  final ValueNotifier<String> tokenStatus = ValueNotifier("Checking token...");
 
   @override
   void initState() {
@@ -25,27 +25,31 @@ class _CreatePostPageState extends State<CreatePostPage> {
     checkToken();
   }
 
+  @override
+  void dispose() {
+    titleController.dispose();
+    bodyController.dispose();
+    isLoading.dispose();
+    responseMessage.dispose();
+    tokenStatus.dispose();
+    super.dispose();
+  }
+
   Future<void> checkToken() async {
     try {
       final response = await ApiServices.dio.get(
-        'posts', // any protected endpoint
+        'posts',
         options: Options(
           headers: {'Authorization': 'Bearer ${Urls.trefleToken}'},
         ),
       );
 
-      setState(() {
-        tokenStatus = "Token is valid! Status: ${response.statusCode}";
-      });
+      tokenStatus.value = "Token is valid! Status: ${response.statusCode}";
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        setState(() {
-          tokenStatus = "Token is invalid or expired";
-        });
+        tokenStatus.value = "Token is invalid or expired";
       } else {
-        setState(() {
-          tokenStatus = "Error checking token: ${e.message}";
-        });
+        tokenStatus.value = "Error checking token: ${e.message}";
       }
     }
   }
@@ -63,10 +67,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       return;
     }
 
-    setState(() {
-      isLoading = true;
-      responseMessage = "Sending post...";
-    });
+    isLoading.value = true;
+    responseMessage.value = "Sending post...";
 
     var response = await sendFormData(
       title: titleController.text,
@@ -74,10 +76,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       userId: 1,
     );
 
-    setState(() {
-      isLoading = false;
-      responseMessage = response;
-    });
+    isLoading.value = false;
+    responseMessage.value = response;
 
     if (response.toLowerCase().contains("success")) {
       titleController.clear();
@@ -113,13 +113,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
         padding: const EdgeInsets.all(30),
         child: Column(
           children: [
-            Text(
-              tokenStatus,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-                fontSize: 16,
-              ),
+            ValueListenableBuilder<String>(
+              valueListenable: tokenStatus,
+              builder: (context, value, child) {
+                return Text(
+                  value,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                    fontSize: 16,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
             TextField(
@@ -166,27 +171,37 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: isLoading ? null : sendPost,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 15,
-                ),
-                backgroundColor: Colors.blue[300],
-              ),
-              child:
-                  isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Send Post"),
+            ValueListenableBuilder<bool>(
+              valueListenable: isLoading,
+              builder: (context, value, child) {
+                return ElevatedButton(
+                  onPressed: value ? null : sendPost,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                      vertical: 15,
+                    ),
+                    backgroundColor: Colors.blue[300],
+                  ),
+                  child:
+                      value
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text("Send Post"),
+                );
+              },
             ),
             const SizedBox(height: 20),
-            Text(
-              responseMessage,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
+            ValueListenableBuilder<String>(
+              valueListenable: responseMessage,
+              builder: (context, value, child) {
+                return Text(
+                  value,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                );
+              },
             ),
           ],
         ),
