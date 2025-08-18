@@ -16,7 +16,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
   String responseMessage = "";
 
   void sendPost() async {
-    // Check if fields are empty
     if (titleController.text.trim().isEmpty ||
         bodyController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -26,7 +25,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
           duration: Duration(seconds: 2),
         ),
       );
-      return; // stop execution
+      return;
     }
 
     setState(() {
@@ -45,8 +44,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
       responseMessage = response;
     });
 
-    // Show snackbar if successful
     if (response.toLowerCase().contains("success")) {
+      titleController.clear();
+      bodyController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Post sent successfully!"),
@@ -68,19 +68,44 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Post")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.amber[200],
+      appBar: AppBar(
+        title: const Text("Create Post"),
+        centerTitle: true,
+        backgroundColor: Colors.blue[200],
+      ),
+      body: Container(
+        padding: EdgeInsets.all(30),
         child: Column(
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: 'Title',
+                labelStyle: TextStyle(color: Colors.red),
+                hintText: 'Enter post title',
+                filled: true,
+                fillColor: Colors.green,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue, width: 1.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: bodyController,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: 'Body',
+                labelStyle: TextStyle(color: Colors.red),
+                hintText: 'Enter post body',
+                filled: true,
+                fillColor: Colors.green,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue, width: 1.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(

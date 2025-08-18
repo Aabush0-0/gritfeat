@@ -7,13 +7,17 @@ Future<String> sendFormData({
   required int userId,
 }) async {
   try {
-    FormData formData = FormData.fromMap({
+    final formData = FormData.fromMap({
       "title": title,
       "body": body,
       "userId": userId,
     });
 
-    Response response = await DioClient.dio.post("posts", data: formData);
+    final response = await ApiServices.dio.post(
+      "posts",
+      data: formData,
+      options: Options(headers: {"Content-Type": "multipart/form-data"}),
+    );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return "FormData sent successfully! ID: ${response.data['id']}";
@@ -22,5 +26,7 @@ Future<String> sendFormData({
     }
   } on DioException catch (e) {
     return "Dio error: ${e.response?.data ?? e.message}";
+  } catch (e) {
+    return "Unexpected error: $e";
   }
 }

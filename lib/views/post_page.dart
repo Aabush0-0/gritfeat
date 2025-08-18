@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_app/core/networks/api_services.dart';
 import 'package:my_app/services/form_data.dart';
 import 'package:my_app/services/post_model.dart';
+import 'package:my_app/services/send_post.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -11,13 +12,10 @@ class PostPage extends StatefulWidget {
 }
 
 class _PostPageState extends State<PostPage> {
-  // ValueNotifiers for data and loading
   final ValueNotifier<List<Post>> postsNotifier = ValueNotifier([]);
   final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(true);
-
-  //formData response
   final ValueNotifier<String> formDataResponseNotifier = ValueNotifier(
-    'Sending FormData ...',
+    'FormData not sent yet',
   );
 
   @override
@@ -28,13 +26,18 @@ class _PostPageState extends State<PostPage> {
   }
 
   Future<void> loadFormData() async {
-    var response = await sendFormData(title: 'Title', body: 'body', userId: 1);
-    formDataResponseNotifier.value = response.toString();
+    formDataResponseNotifier.value = "Sending FormData...";
+    final response = await sendFormData(
+      title: 'Title',
+      body: 'body',
+      userId: 1,
+    );
+    formDataResponseNotifier.value = response;
   }
 
-  void fetchPosts() async {
+  Future<void> fetchPosts() async {
     try {
-      var response = await DioClient.dio.get('posts');
+      final response = await ApiServices.dio.get('posts');
 
       if (response.data is List) {
         postsNotifier.value =
@@ -43,8 +46,17 @@ class _PostPageState extends State<PostPage> {
         postsNotifier.value = [];
       }
     } catch (e) {
-      print('Error fetching posts: $e');
       postsNotifier.value = [];
+      Future.microtask(() {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to fetch posts: $e"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
     } finally {
       isLoadingNotifier.value = false;
     }
@@ -56,21 +68,30 @@ class _PostPageState extends State<PostPage> {
       appBar: AppBar(title: const Text('Posts & FormData')),
       body: Column(
         children: [
-          // Show FormData response
-          ValueListenableBuilder<String>(
-            valueListenable: formDataResponseNotifier,
-            builder: (context, response, _) {
-              return Text(
-                response,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ValueListenableBuilder<String>(
+              valueListenable: formDataResponseNotifier,
+              builder: (context, response, _) {
+                return Card(
+                  color: Colors.blue.shade50,
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      response,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
 
-          // Posts list
+          // Posts Section
           Expanded(
             child: ValueListenableBuilder<bool>(
               valueListenable: isLoadingNotifier,
@@ -82,11 +103,19 @@ class _PostPageState extends State<PostPage> {
                 return ValueListenableBuilder<List<Post>>(
                   valueListenable: postsNotifier,
                   builder: (context, posts, _) {
+                    if (posts.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No posts available.",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      );
+                    }
+
                     return ListView.builder(
                       itemCount: posts.length,
                       itemBuilder: (context, index) {
                         final post = posts[index];
-
                         return Card(
                           margin: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -124,6 +153,15 @@ class _PostPageState extends State<PostPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreatePostPage()),
+          );
+        },
+        child: const Icon(Icons.send),
       ),
     );
   }

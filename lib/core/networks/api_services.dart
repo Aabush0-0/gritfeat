@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:my_app/core/networks/api_urls.dart';
 
-class DioClient {
-  DioClient._internal() {
+class ApiServices {
+  ApiServices._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: Urls.baseUrl,
@@ -20,9 +20,9 @@ class DioClient {
         error: true,
       ),
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          options.headers['Authorization'] = 'Bearer myToken123';
-          print("Sending request to: ${options.uri}");
+        onRequest: (options, handler) async {
+          options.queryParameters['token'] = Urls.trefleToken;
+
           return handler.next(options);
         },
         onResponse: (response, handler) {
@@ -37,7 +37,7 @@ class DioClient {
     ]);
   }
 
-  static final DioClient _instance = DioClient._internal();
+  static final ApiServices _instance = ApiServices._internal();
 
   late Dio _dio;
 

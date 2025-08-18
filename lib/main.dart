@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/services/send_post.dart';
+import 'package:my_app/views/post_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Optional here
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: CreatePostPage(),
+      home: PostPage(),
     );
   }
 }

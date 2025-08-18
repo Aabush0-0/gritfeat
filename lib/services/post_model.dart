@@ -11,7 +11,6 @@ class Post {
     required this.body,
   });
 
-  // Factory constructor to create a Post from JSON
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       userId: json['userId'] ?? 0,
