@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:my_app/views/post_page.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized(); // Optional here
+Future<void> main() async {
+  await dotenv.load(fileName: ".env"); // load the env file
   runApp(const MyApp());
 }
 

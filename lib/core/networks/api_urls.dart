@@ -1,5 +1,7 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class Urls {
   static const baseUrl = 'https://jsonplaceholder.typicode.com/';
 
-  static const trefleToken = 'FmD7Mfk_LPE-8NejnzFCdOfpLHIXUPzgT4aJ5zUdcrE';
+  static String get trefleToken => dotenv.env['TREFLE_TOKEN'] ?? '';
 }

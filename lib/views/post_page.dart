@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/core/networks/api_services.dart';
 import 'package:my_app/services/form_data.dart';
-import 'package:my_app/services/post_model.dart';
-import 'package:my_app/services/send_post.dart';
+import 'package:my_app/models/post_model.dart';
+import 'package:my_app/services/create_post_page.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
