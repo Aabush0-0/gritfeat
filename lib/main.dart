@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:my_app/views/post_page.dart';
+import 'package:my_app/models/counter_provider.dart';
+import 'package:my_app/views/counter_page.dart';
+import 'package:provider/provider.dart';
 
-Future<void> main() async {
-  await dotenv.load(fileName: ".env"); // load the env file
-  runApp(const MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => CounterProvider())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: PostPage(),
+      home: CounterPage(),
     );
   }
 }
